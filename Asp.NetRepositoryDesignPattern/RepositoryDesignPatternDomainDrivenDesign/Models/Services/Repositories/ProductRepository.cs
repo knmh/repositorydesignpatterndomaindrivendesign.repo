@@ -231,5 +231,3 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Models.Services.Repositories
         #endregion
     }
 }
-
-

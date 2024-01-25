@@ -1,4 +1,6 @@
-﻿@model IEnumerable<RepositoryDesignPatternDomainDrivenDesign.Controllers.Dtos.ProductDtos.SelectProductDto>
+﻿@model RepositoryDesignPatternDomainDrivenDesign.Controllers.Dtos.ProductDtos.SelectProductDtoController
+
+
 
 @{
     ViewData["Title"] = "Index";
@@ -13,20 +15,22 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                Title
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Quantity)
+                Quantity
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UnitPrice)
+                UnitPrice
             </th>
-
+            <th>
+                Price
+            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Products)
         {
             <tr>
                 <td>
@@ -38,7 +42,9 @@
                 <td>
                     @item.UnitPrice.ToString("N3")
                 </td>
-
+                <td>
+                    @item.Price.ToString("N3")
+                </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

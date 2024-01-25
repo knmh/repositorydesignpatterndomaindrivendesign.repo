@@ -10,28 +10,28 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Models.Services
     {
         #region [ctor]
         public OnlineShopDbContext()
+    {
+
+    }
+    #endregion
+
+    #region [OnlineShopDbContext(DbContextOptions options)]
+ 
+        public OnlineShopDbContext(DbContextOptions<OnlineShopDbContext> options) : base(options)
         {
-
-        }
-        #endregion
-
-        #region [OnlineShopDbContext(DbContextOptions options)]
-        public OnlineShopDbContext(DbContextOptions options) : base(options)
-        {
-
         }
         #endregion
 
         #region [OnModelCreating(ModelBuilder modelBuilder)]
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-        }
-        #endregion
-
-        #region [Props]
-        public DbSet<Person>? Person { get; set; }
-        public DbSet<Product>? Product { get; set; }
-        #endregion
+    {
+        base.OnModelCreating(modelBuilder);
     }
+    #endregion
+
+    #region [Props]
+    public DbSet<Person>? Person { get; set; }
+    public DbSet<Product>? Product { get; set; }
+    #endregion
+}
 }

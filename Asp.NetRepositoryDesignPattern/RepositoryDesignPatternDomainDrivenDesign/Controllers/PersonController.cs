@@ -1,49 +1,42 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Dtos.PersonDtos;
+using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services;
 using RepositoryDesignPatternDomainDrivenDesign.Controllers.Dtos.PersonDtos;
 using RepositoryDesignPatternDomainDrivenDesign.Models.DomainModels.PersonAggregates;
 using RepositoryDesignPatternDomainDrivenDesign.Models.Services.Contracts;
+
 
 namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
 {
     public class PersonController : Controller
     {
         #region [Private State]
-        private readonly Models.Services.Contracts.IPersonRepository<Person, Guid?> _personRepository;
+        private readonly ApplicationServices.Services.PersonService _personService;
         private readonly Person _person;
+        private readonly IMapper _mapper;
         #endregion
 
         #region [Ctor]
-        public PersonController(IPersonRepository<Person, Guid?> personRepository)
+        public PersonController(PersonService personService, IMapper mapper)
         {
-            _personRepository = personRepository;
+            _personService = personService;
             _person = new Person();
+            _mapper = mapper;
         }
 
         #endregion
-
         #region [async Task<IActionResult> Index()]
         // GET: PersonController
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-
-            var people = await _personRepository.SelectAllAsync();
-            var selectPersonDtos = new List<SelectPersonDto>();
-
-            foreach (var person in people)
+            var selectPersonDtos = await _personService.ShowAll();
+            var selectPersonDtoController = new SelectPersonDtoController
             {
-                var selectPersonDto = new SelectPersonDto
-                {
-                    Id = person.Id,
-                    FirstName = person.FirstName,
-                    LastName = person.LastName
-                };
-
-                selectPersonDtos.Add(selectPersonDto);
-            }
-
-            return View(selectPersonDtos);
-
+                People = _mapper.Map<List<SelectPersonDtoService>>(selectPersonDtos)
+            };
+            return View(selectPersonDtoController);
         }
         #endregion
 
@@ -59,30 +52,27 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         #region [async Task<IActionResult> Create(InsertPersonDto insertPersonDto]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(InsertPersonDto insertPersonDto)
+        public async Task<IActionResult> Create(InsertPersonDtoController insetPersonDtoController)
         {
-            // should I new person ??
             if (ModelState.IsValid)
             {
-                _person.Id = null;
-                _person.FirstName = insertPersonDto.FirstName;
-                _person.LastName = insertPersonDto.LastName;
-                await _personRepository.InsertAsync(_person);
+
+                var insertPersonDtoGet = _mapper.Map<InsertPersonDtoService>(insetPersonDtoController);
+                await _personService.Save(insertPersonDtoGet);
                 return RedirectToAction(nameof(Index));
             }
-            return View(insertPersonDto);
-
+            return View(insetPersonDtoController);
         }
         #endregion
 
         #region [async Task<IActionResult> Delete(DeletePersonDtoGet? deletePersonDtoGet)]
         // GET: People/Delete/5
         [HttpGet]
-        public async Task<IActionResult> Delete(DeletePersonDtoGet? deletePersonDtoGet)
+
+        public async Task<IActionResult> Delete(DeletePersonDtoGetController? deletePersonDtoGetController)
         {
-            _person.Id = deletePersonDtoGet.Id;
-        
-            return View(deletePersonDtoGet);
+
+            return View(deletePersonDtoGetController);
         }
         #endregion
 
@@ -90,22 +80,21 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         // POST: People/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPost deletePersonDtoPost)
+        public async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPostController deletePersonDtoPostController)
         {
-            _person.Id = deletePersonDtoPost.Id;
-            await _personRepository.DeleteAsync(_person);
+            var deletePersonDtoPost = _mapper.Map<DeletePersonDtoPostService>(deletePersonDtoPostController);
+            await _personService.DeleteConfirmed(deletePersonDtoPost);
             return RedirectToAction(nameof(Index));
+
         }
         #endregion
 
         #region [async Task<IActionResult> Edit(UpdatePersonDtoPost updatePersonDtoPost)]
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdatePersonDtoPost updatePersonDtoPost)
+        public async Task<IActionResult> Edit(UpdatePersonDtoPostController updatePersonDtoPostController)
         {
-            _person.Id = updatePersonDtoPost.Id;
-            _person.FirstName = updatePersonDtoPost.FirstName;
-            _person.LastName = updatePersonDtoPost.LastName;
-            await _personRepository.UpdateAsync(_person);
+            var updatePersonDtoPost = _mapper.Map<UpdatePersonDtoPostService>(updatePersonDtoPostController);
+            await _personService.Edit(updatePersonDtoPost);
             return RedirectToAction(nameof(Index));
         }
         #endregion
@@ -113,26 +102,14 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         #region [async Task<IActionResult> Edit(UpdatePersonDtoGet? updatePersonDtoGet)]
         // GET: People/Edit/5
         [HttpGet]
-        public async Task<IActionResult> Edit(UpdatePersonDtoGet? updatePersonDtoGet)
+        public async Task<IActionResult> Edit(UpdatePersonDtoGetController? updatePersonDtoGetController)
         {
-            if (updatePersonDtoGet.Id == null)
-            {
-                throw new ArgumentNullException(nameof(updatePersonDtoGet.Id));
-            }
 
-            var person = await _personRepository.SelectByIdAsync(updatePersonDtoGet.Id);
-            if (person == null)
-            {
-                throw new ArgumentException("Person not found");
-            }
-            var updatePersonDto = new UpdatePersonDtoPost
-            {
-                Id = person.Id,
-                FirstName = person.FirstName,
-                LastName = person.LastName
-            };
+            var updatePersonDtoGet = _mapper.Map<UpdatePersonDtoGetService>(updatePersonDtoGetController);
+            var person = await _personService.Edit(updatePersonDtoGet);
+            var updatePersonDtoPostController = _mapper.Map<UpdatePersonDtoPostController>(person);
+            return View(updatePersonDtoPostController);
 
-            return View("Edit", updatePersonDto);
         }
         #endregion
     }

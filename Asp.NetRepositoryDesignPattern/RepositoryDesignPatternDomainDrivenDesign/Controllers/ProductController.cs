@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Dtos.ProductDtos;
+using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services;
 using RepositoryDesignPatternDomainDrivenDesign.Controllers.Dtos.ProductDtos;
 using RepositoryDesignPatternDomainDrivenDesign.Models.DomainModels.ProductAggregates;
 using RepositoryDesignPatternDomainDrivenDesign.Models.Services.Contracts;
@@ -7,58 +10,43 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
 {
     public class ProductController : Controller
     {
+
         #region [Private State]
-        private readonly Models.Services.Contracts.IProductRepository<Product, Guid?> _productRepository;
+        private readonly ApplicationServices.Services.ProductService _productService;
         private readonly Product _product;
+        private readonly IMapper _mapper;
         #endregion
 
         #region [Ctor]
-        public ProductController(IProductRepository<Product, Guid?> productRepository)
+        public ProductController(ProductService productService, IMapper mapper)
         {
-            _productRepository = productRepository;
+            _productService = productService;
             _product = new Product();
+            _mapper = mapper;
         }
+
         #endregion
 
         #region [Task<IActionResult> Edit(UpdateProductDtoPost updateProductDtoPost)]
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateProductDtoPost updateProductDtoPost)
+        public async Task<IActionResult> Edit(UpdateProductDtoPostController updateProductDtoPostController)
         {
-            _product.Id = updateProductDtoPost.Id;
-            _product.Title = updateProductDtoPost.Title;
-            _product.UnitPrice = updateProductDtoPost.UnitPrice;
-            _product.Quantity = updateProductDtoPost.Quantity;
-            await _productRepository.UpdateAsync(_product);
+            var updateProductDtoPost = _mapper.Map<UpdateProductDtoPostService>(updateProductDtoPostController);
+            await _productService.Edit(updateProductDtoPost);
             return RedirectToAction(nameof(Index));
         }
+
         #endregion
 
         #region [Task<IActionResult> Edit(UpdateProductDtoGet? updateProductDtoGet)]
         // GET: products/Edit/5
         [HttpGet]
-        public async Task<IActionResult> Edit(UpdateProductDtoGet? updateProductDtoGet)
+        public async Task<IActionResult> Edit(UpdateProductDtoGetController? updateProductDtoGetController)
         {
-            if (updateProductDtoGet.Id == null)
-            {
-                throw new ArgumentNullException(nameof(updateProductDtoGet.Id));
-            }
-            var product = await _productRepository.SelectByIdAsync(updateProductDtoGet.Id);
-
-            if (product == null)
-            {
-                throw new ArgumentException("Product not found");
-            }
-
-            var updateProductDto = new UpdateProductDtoPost
-            {
-                Id = product.Id,
-                Title = product.Title,
-                UnitPrice = product.UnitPrice,
-                Quantity = product.Quantity
-            };
-
-            return View("Edit", updateProductDto);
-
+            var updateProductDtoGet = _mapper.Map<UpdateProductDtoGetService>(updateProductDtoGetController);
+            var product = await _productService.Edit(updateProductDtoGet);
+            var updateProductDtoPostController = _mapper.Map<UpdateProductDtoPostController>(product);
+            return View(updateProductDtoPostController);
         }
         #endregion
 
@@ -68,24 +56,13 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         public async Task<IActionResult> Index()
         {
 
-            var products = await _productRepository.SelectAllAsync();
-            var SelectProductDtos = new List<SelectProductDto>();
-
-            foreach (var product in products)
+            var selectProductDtos = await _productService.ShowAll();
+            var selectProductDtoController = new SelectProductDtoController
             {
-                var selectProductDto = new SelectProductDto
-                {
-                    Id = product.Id,
-                    Title = product.Title,
-                    UnitPrice = product.UnitPrice,
-                    Quantity = product.Quantity,
-                };
+                Products = _mapper.Map<List<SelectProductDtoService>>(selectProductDtos)
+            };
 
-                SelectProductDtos.Add(selectProductDto);
-            }
-
-            return View(SelectProductDtos);
-
+            return View(selectProductDtoController);
         }
         #endregion
 
@@ -101,19 +78,16 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         #region [Task<IActionResult> Create(InsertProductDto insertProductDto)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(InsertProductDto insertProductDto)
+        public async Task<IActionResult> Create(InsertProductDtoController insertProductDtoController)
         {
             if (ModelState.IsValid)
             {
-                _product.Id = null;
-                _product.UnitPrice = insertProductDto.UnitPrice;
-                _product.Quantity = insertProductDto.Quantity;
-                _product.Title = insertProductDto.Title;
 
-                await _productRepository.InsertAsync(_product);
+                var insertProductDtoGet = _mapper.Map<InsertProductDtoService>(insertProductDtoController);
+                await _productService.Save(insertProductDtoGet);
                 return RedirectToAction(nameof(Index));
             }
-            return View(insertProductDto);
+            return View(insertProductDtoController);
 
         }
         #endregion
@@ -121,11 +95,10 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         #region [Task<IActionResult> Delete(DeleteProductDtoGet? deleteProductDtoGet)]
         // GET:Products/Delete/5
         [HttpGet]
-        public async Task<IActionResult> Delete(DeleteProductDtoGet? deleteProductDtoGet)
+        public async Task<IActionResult> Delete(DeleteProductDtoGetController? deleteProductDtoGetController)
         {
-            _product.Id = deleteProductDtoGet.Id;
-          
-            return View(deleteProductDtoGet);
+
+            return View(deleteProductDtoGetController);
         }
         #endregion
 
@@ -133,12 +106,13 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         // POST:Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(DeleteProductDtoPost deleteProductDtoPost)
+        public async Task<IActionResult> DeleteConfirmed(DeleteProductDtoPostController deleteProductDtoPostController)
         {
-            _product.Id = deleteProductDtoPost.Id;
-            await _productRepository.DeleteAsync(_product);
+            var deleteProductDtoPost = _mapper.Map<DeleteProductDtoPostService>(deleteProductDtoPostController);
+            await _productService.DeleteConfirmed(deleteProductDtoPost);
             return RedirectToAction(nameof(Index));
         }
         #endregion
     }
 }
+
