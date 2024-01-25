@@ -44,7 +44,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
         }
         #endregion
 
-        #region [Save(InsertPersonDto insertPersonDto)]
+        #region [Save(InsertPersonDtoService insertPersonDtoService)]
         public async Task Save(InsertPersonDtoService insertPersonDtoService)
         {
             _person.Id = null;
@@ -54,7 +54,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
         }
         #endregion
 
-        #region [Delete(DeletePersonDtoGet? deletePersonDtoGet)]
+        #region [Delete(DeletePersonDtoGetService? deletePersonDtoGetService)]
         public async Task<DeletePersonDtoGetService> Delete(DeletePersonDtoGetService? deletePersonDtoGetService)
         {
 

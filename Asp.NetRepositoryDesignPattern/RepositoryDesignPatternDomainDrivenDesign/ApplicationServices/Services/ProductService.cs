@@ -47,7 +47,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
         }
         #endregion
 
-        #region [Save(InsertProductDto insertProductDto)]
+        #region [Save(InsertProductDtoService insertProductDto)]
         public async Task Save(InsertProductDtoService insertProductDto)
         {
             _product.Id = null;

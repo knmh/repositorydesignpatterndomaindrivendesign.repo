@@ -27,7 +27,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
 
         #endregion
 
-        #region [Task<IActionResult> Edit(UpdateProductDtoPost updateProductDtoPost)]
+        #region [Task<IActionResult> Edit(UpdateProductDtoPostController updateProductDtoPostController)]
         [HttpPost]
         public async Task<IActionResult> Edit(UpdateProductDtoPostController updateProductDtoPostController)
         {
@@ -38,7 +38,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
 
         #endregion
 
-        #region [Task<IActionResult> Edit(UpdateProductDtoGet? updateProductDtoGet)]
+        #region [Task<IActionResult> Edit(UpdateProductDtoGetController? updateProductDtoGetController)]
         // GET: products/Edit/5
         [HttpGet]
         public async Task<IActionResult> Edit(UpdateProductDtoGetController? updateProductDtoGetController)
@@ -75,7 +75,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         }
         #endregion
 
-        #region [Task<IActionResult> Create(InsertProductDto insertProductDto)]
+        #region [Task<IActionResult> Create(InsertProductDtoController insertProductDtoController)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(InsertProductDtoController insertProductDtoController)
@@ -92,7 +92,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         }
         #endregion
 
-        #region [Task<IActionResult> Delete(DeleteProductDtoGet? deleteProductDtoGet)]
+        #region [Task<IActionResult> Delete(DeleteProductDtoGetController? deleteProductDtoGetController)]
         // GET:Products/Delete/5
         [HttpGet]
         public async Task<IActionResult> Delete(DeleteProductDtoGetController? deleteProductDtoGetController)
@@ -102,7 +102,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         }
         #endregion
 
-        #region [Task<IActionResult> DeleteConfirmed(DeleteProductDtoPost deleteProductDtoPost)]
+        #region [Task<IActionResult> DeleteConfirmed(DeleteProductDtoPostController deleteProductDtoPostController)]
         // POST:Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

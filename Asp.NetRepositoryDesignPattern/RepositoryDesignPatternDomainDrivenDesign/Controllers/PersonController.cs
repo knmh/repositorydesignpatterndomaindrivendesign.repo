@@ -49,7 +49,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         }
         #endregion
 
-        #region [async Task<IActionResult> Create(InsertPersonDto insertPersonDto]
+        #region [async Task<IActionResult> Create(InsertPersonDtoController insetPersonDtoController)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(InsertPersonDtoController insetPersonDtoController)
@@ -65,7 +65,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         }
         #endregion
 
-        #region [async Task<IActionResult> Delete(DeletePersonDtoGet? deletePersonDtoGet)]
+        #region [async Task<IActionResult> Delete(DeletePersonDtoGetController? deletePersonDtoGetController)]
         // GET: People/Delete/5
         [HttpGet]
 
@@ -76,7 +76,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         }
         #endregion
 
-        #region [async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPost deletePersonDtoPost)]
+        #region [async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPostController deletePersonDtoPostController)]
         // POST: People/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -89,7 +89,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         }
         #endregion
 
-        #region [async Task<IActionResult> Edit(UpdatePersonDtoPost updatePersonDtoPost)]
+        #region [async Task<IActionResult> Edit(UpdatePersonDtoPostController updatePersonDtoPostController)]
         [HttpPost]
         public async Task<IActionResult> Edit(UpdatePersonDtoPostController updatePersonDtoPostController)
         {
@@ -99,7 +99,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         }
         #endregion
 
-        #region [async Task<IActionResult> Edit(UpdatePersonDtoGet? updatePersonDtoGet)]
+        #region [async Task<IActionResult> Edit(UpdatePersonDtoGetController? updatePersonDtoGetController)]
         // GET: People/Edit/5
         [HttpGet]
         public async Task<IActionResult> Edit(UpdatePersonDtoGetController? updatePersonDtoGetController)
