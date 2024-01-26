@@ -40,6 +40,28 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Models.Services.Repositories
         }
         #endregion
 
+        #region [GetPersonByIdAsync(Guid? id)]
+        public async Task<IEnumerable<Person>> GetPersonByIdAsync()
+        {
+            using (var context = _context)
+            {
+                try
+                {
+                    var existingPersons = await context.Person.ToListAsync();
+                    return existingPersons;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    await context.DisposeAsync();
+                }
+            }
+        }
+        #endregion
+
         #region [SelectAllAsync()]
         public async Task<IEnumerable<Person>> SelectAllAsync()
         {
@@ -66,6 +88,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Models.Services.Repositories
 
 
         }
+
         #endregion
 
         #region [DeleteAsync(Guid? id)]
@@ -138,13 +161,14 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Models.Services.Repositories
         #endregion
 
         #region [InsertAsync(Person Person)]
-        public async Task InsertAsync(Person Person)
+        public async Task InsertAsync(Person person)
         {
             using (_context)
             {
                 try
                 {
-                    var existingPerson = await _context.Person.AddAsync(Person);
+                    //person.AbstractId = Guid.NewGuid().ToString();
+                    var existingPerson = await _context.Person.AddAsync(person);
                     await _context.SaveChangesAsync();
 
                 }
@@ -192,6 +216,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Models.Services.Repositories
         }
         #endregion
 
+
         #region [UpdateAsync(Guid? id)]
         public async Task UpdateAsync(Guid? id)
         {
@@ -227,8 +252,9 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Models.Services.Repositories
             }
 
         }
-        #endregion
 
+
+        #endregion
     }
 }
 

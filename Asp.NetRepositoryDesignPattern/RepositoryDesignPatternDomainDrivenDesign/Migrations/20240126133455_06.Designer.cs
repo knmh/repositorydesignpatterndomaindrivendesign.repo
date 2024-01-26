@@ -12,8 +12,8 @@ using RepositoryDesignPatternDomainDrivenDesign.Models.Services;
 namespace RepositoryDesignPatternDomainDrivenDesign.Migrations
 {
     [DbContext(typeof(OnlineShopDbContext))]
-    [Migration("20240125153313_03")]
-    partial class _03
+    [Migration("20240126133455_06")]
+    partial class _06
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,6 +30,10 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Migrations
                     b.Property<Guid?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AbstractId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()

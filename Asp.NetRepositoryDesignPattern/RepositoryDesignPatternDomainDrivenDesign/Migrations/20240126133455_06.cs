@@ -5,7 +5,7 @@
 namespace RepositoryDesignPatternDomainDrivenDesign.Migrations
 {
     /// <inheritdoc />
-    public partial class _03 : Migration
+    public partial class _06 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -17,13 +17,9 @@ builder.Services.AddDbContextPool<OnlineShopDbContext>(
     options => options.UseSqlServer(
         builder.Configuration.GetConnectionString("Default")
     ));
-builder.Services.AddScoped<PersonService>();
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IPersonRepository<Person, Guid?>, PersonRepository<Person, Guid?>>();
-builder.Services.AddScoped<IProductRepository<Product, Guid?>, ProductRepository<Product, Guid?>>();
+//builder.Services.AddScoped<IProductRepository<Product, Guid?>, ProductRepository<Product, Guid?>>();
 builder.Services.AddScoped<IPersonApplicationService<SelectPersonDtoService, SelectPersonDtoService, SelectPersonDtoService, InsertPersonDtoService, DeletePersonDtoPostService, UpdatePersonDtoPostService>, PersonService>();
-builder.Services.AddScoped<IProductApplicationService<SelectPersonDtoService, SelectPersonDtoService, SelectPersonDtoService, InsertPersonDtoService, DeletePersonDtoPostService, UpdatePersonDtoPostService>, ProductService>();
 
 
 
@@ -47,8 +43,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Person}/{action=Person}/{id?}");
 
 app.Run();
-
-

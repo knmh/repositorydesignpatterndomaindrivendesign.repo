@@ -14,7 +14,9 @@
 
         Task UpdateAsync(TUpdateAsync entity);
 
-       
+        //Task<IEnumerable<TFillIdMapper>> FillIdMapper();
+
+
 
 
 

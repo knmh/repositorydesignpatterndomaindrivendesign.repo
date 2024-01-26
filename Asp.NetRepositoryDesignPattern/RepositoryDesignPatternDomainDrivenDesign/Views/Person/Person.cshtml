@@ -1,0 +1,666 @@
+﻿@model RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Dtos.PersonDtos.PersonListDto
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Single Page Architecture</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .button-container {
+            grid-column: span 2; 
+            display: flex;
+            justify-content: flex-end; 
+            align-items: center;
+        }
+
+        .button {
+            padding: 8px 16px; 
+            font-size: 14px; 
+            border: none; 
+            cursor: pointer;
+            border-radius: 4px; 
+            transition: background-color 0.3s ease; 
+        }
+
+        .button-row {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #saveButton {
+            background-color: #4CAF50; 
+            color: white; 
+            margin-right: 10px; 
+        }
+
+        #buttonCancel {
+            background-color: #808080; 
+            color: white;
+        }
+
+        }
+        .line {
+            border-top: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 20px;
+            margin-bottom: 20px;
+            background-color: #f0f0f0; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); 
+        }
+
+        .grid-item {
+            background-color: #fff; 
+            padding: 10px;
+            border: none; 
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); 
+            border-radius: 4px; 
+        }
+
+        .button-container {
+            grid-column: span 2; 
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px; 
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+            transition: background-color 0.3s ease; 
+        }
+
+            .button:hover {
+                background-color: #45a049; 
+            }
+
+        .modal-container {
+            max-width: 400px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            background-color: rgb(255, 255, 255);
+            padding: 2rem;
+            border-radius: 5px;
+            box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+            z-index: 5;
+        }
+
+        #firstNameMsg,
+        #lastNameMsg {
+            color: red;
+        }
+
+        .success-message::before, .error-message::before {
+            content: "✔"; 
+            color: green;
+            font-size: 20px;
+            margin-right: 8px; 
+       
+        }
+
+        .error-message::before {
+            content: "❌"; 
+            color: red; 
+           
+        }
+
+        .success-message {
+            border-color: green; 
+        }
+
+        .error-message {
+            border-color: red; 
+        }
+   
+       
+        .centered-message-box {
+            position:fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            color: gray;
+            font-size: 14px;
+            display: none;
+            border: 2px solid black;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 12px 16px;
+            border-radius: 8px;
+        }
+
+       
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .notification-message {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+            .notification-message.success {
+                background-color: #d4edda;
+                border-color: #c3e6cb;
+                color: #155724;
+            }
+
+            .notification-message.error {
+                background-color: #f8d7da;
+                border-color: #f5c6cb;
+                color: #721c24;
+            }
+
+        th {
+            cursor: pointer;
+        }
+
+        .sort-arrow {
+            display: inline-block;
+            color: black;
+            margin-left: 5px;
+        }
+
+        th:hover .sort-arrow {
+            color: blue;
+        }
+
+    </style>
+</head>
+
+<body>
+
+
+   
+    <div class="grid-container">
+        <div class="grid-item">
+            <label for="firstName">First Name</label>
+            <div id="firstNameMsg"></div>
+            <input type="text" class="form-control" id="firstName" placeholder="Enter first name" required>
+        </div>
+        <div class="grid-item">
+            <label for="lastName">Last Name</label>
+            <div id="lastNameMsg"></div>
+            <input type="text" class="form-control" id="lastName" placeholder="Enter last name" required>
+        </div>
+        <div>
+         
+            <button type="button" id="btnsave" class="btn button" onclick="handleSaveButtonClick()">Add <i class="bi bi-person-fill-add"></i></button>
+        </div>
+    </div>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <table class="table" id="table">
+                        <thead>
+                            <tr>
+                                <th id="idInput" class="hidden">Id</th>
+                          
+                            <th onclick="sortTable(0)">First Name <span class="sort-arrow">↑↓</span></th>
+                            <th onclick="sortTable(1)">Last Name <span class="sort-arrow">↑↓</span></th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr hidden>
+                            
+                                <td>
+                                    <button class="btn btn-danger" onclick="handleDeleteButtonClick(this)"><i class="bi bi-trash"></i></button>
+                                    <button class="btn btn-primary" onclick="handleEditClick('${rowId}','${rowIndex}')"><i class="bi bi-pencil"></i></button>
+                                </td>
+                            </tr> 
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal-container hidden" id="modalContainer">
+        <div class="modal-content">
+            <p id="modalMessage"></p>
+            <label for="modalFirstName">First Name</label>
+            <input type="text" class="form-control" id="modalFirstName" placeholder="Enter first name">
+            <label for="modalLastName">Last Name</label>
+            <input type="text" class="form-control" id="modalLastName" placeholder="Enter last name">
+            <div class="button-row">
+                <button type="button" id="saveButton" class="btn btn-primary button buttonSave">Save</button>
+                <button type="button" id="buttonCancel" class="btn btn-secondary button buttonCancel" onclick="CloseModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div class="overlay hidden"></div>
+    <div id="notificationContainer" class="notification-container"></div>
+
+
+
+
+    <script>
+
+      'use strict';
+   
+
+        //As an example, in normal JavaScript, mistyping a variable name creates a new global variable. In strict mode, this will throw an error, making it impossible to accidentally create a global variable.
+       // In normal JavaScript, a developer will not receive any error feedback assigning values to non - writable properties.
+       // In strict mode, any assignment to a non - writable property, a getter - only property, a non - existing property, a non - existing variable, or a non - existing object, will throw an error.
+
+       
+        //function x(p1, p1) { };
+
+
+        const modal = document.querySelector('.modal-container.hidden');
+        const overlay = document.querySelector('.overlay.hidden');
+        const btns = document.querySelectorAll('.button');
+        const modalFirstName = document.getElementById('modalFirstName');
+        const modalLastName = document.getElementById('modalLastName');
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
+        const firstNameMsg = document.getElementById('firstNameMsg');
+        const lastNameMsg = document.getElementById('lastNameMsg');
+        const cancelBtn = document.querySelector('.buttonCancel');
+        const saveBtn = document.querySelector('.buttonSave');
+        var message = document.getElementById("modalMessage");
+
+
+        const CloseModal = function () {
+            modal.style.display = "none";
+            overlay.style.display = "none";
+            console.log('hiddenadded');
+        }
+        const OpenModal = function () {
+            modal.classList.remove('hidden');
+            overlay.classList.remove('hidden');
+            console.log('hiddenremoved');
+        }
+
+        cancelBtn.addEventListener('click', CloseModal);
+        overlay.addEventListener('click', CloseModal);
+
+            // // Abstract Identifiers: This approach involves using substitute identifiers to represent real IDs, especially in client - side and front - end development.It helps obfuscate sensitive information from being directly exposed to the UI and potentially to end - users.
+            // // Obfuscation: Obfuscation entails intentionally making code or data difficult to understand.It's commonly used to protect software from reverse engineering or to conceal its logic and algorithms. This technique involves altering the code's structure or using complex transformations to
+            //  make it harder for someone to comprehend or modify.
+
+        function updateGrid(abstractId, firstName, lastName, rowIndex) {
+            const existingRow = document.querySelector(`[data-abstract-id="${abstractId}"]`);
+            console.log(abstractId);
+            if (existingRow) {
+                console.log(`Updating existing row with abstractId: ${abstractId}`);
+                existingRow.cells[0].textContent = firstName;
+                existingRow.cells[1].textContent = lastName;
+            } else {
+                console.log(`Inserting new row with abstractId: ${abstractId}`);
+                const table = document.getElementById('table');
+                const newRow = table.insertRow(-1);
+                const rowId = 'row-' + uuidv4();
+                newRow.setAttribute('data-id', rowId);
+                newRow.setAttribute('data-abstract-id', abstractId);
+
+                const cell2 = newRow.insertCell(0);
+                cell2.appendChild(document.createTextNode(firstName));
+
+                const cell3 = newRow.insertCell(1);
+                cell3.appendChild(document.createTextNode(lastName));
+
+                const cell4 = newRow.insertCell(2);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'btn btn-danger';
+                deleteButton.innerHTML = '<i class="bi bi-trash"></i>';
+                deleteButton.onclick = function () {
+                    handleDeleteButtonClick(this);
+                };
+                cell4.appendChild(deleteButton);
+
+                const editButton = document.createElement('button');
+                editButton.className = 'btn btn-primary';
+                editButton.innerHTML = '<i class="bi bi-pencil"></i>';
+                editButton.onclick = function () {
+                    handleEditClick(event, rowIndex);
+                };
+                cell4.appendChild(editButton);
+            }
+        }
+
+       
+      
+
+        /////////////////////////////////////////////////////////////
+
+        function handleSaveButtonClick() {
+            formValidation();
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
+
+            if (firstName && lastName) {
+
+                saveToDatabase(firstName, lastName);
+               
+                firstNameInput.value = "";
+                lastNameInput.value = "";
+            }
+        }
+
+        function formValidation() {
+            const firstNamevalue = firstNameInput.value.trim();
+            const lastNamevalue = lastNameInput.value.trim();
+
+            if (!firstNamevalue) {
+                firstNameMsg.textContent = "First name is required";
+            } else {
+                firstNameMsg.textContent = "";
+            }
+            if (!lastNamevalue) {
+                lastNameMsg.textContent = "Last name is required";
+            } else {
+                lastNameMsg.textContent = "";
+            }
+        }
+
+        function saveToDatabase(firstName, lastName, rowIndex) {
+            $.ajax({
+                url: `http://localhost:5271/Person/Create`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ FirstName: firstName, LastName: lastName, RowIndex: rowIndex }),
+                success: function (response) {
+                    updateGrid(response.abstractId, firstName, lastName);
+                    showMessage(`Saved successfully: ${firstName} ${lastName}`, 'success');
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseJSON?.message || 'Failed to save data';
+                    showMessage(errorMessage, 'error');
+                }
+            });
+        }
+
+        function displayNotification(message, type) {
+            const notificationContainer = document.getElementById('notificationContainer');
+            const notificationMessage = document.createElement('div');
+            notificationMessage.classList.add('notification-message');
+
+            if (type === 'success') {
+                notificationMessage.classList.add('success');
+            } else if (type === 'error') {
+                notificationMessage.classList.add('error');
+            }
+
+            notificationMessage.textContent = message;
+            notificationContainer.appendChild(notificationMessage);
+
+            // Automatically remove the notification after 3 seconds
+            setTimeout(() => notificationContainer.removeChild(notificationMessage), 3000);
+        }
+        function showMessage(text, type) {
+            displayNotification(text, type);
+        }
+
+
+
+        //----------------------------------loadInitialData----------
+        function loadInitialData() {
+            $.ajax({
+                url: `http://localhost:5271/Person/GetPersonByIdJson`,
+                type: 'GET',
+                success: function (response) {
+                    response.forEach(function (person) {
+                        updateGrid(person.abstractId, person.firstName, person.lastName);
+                    });
+                    console.log('Initial data loaded successfully');
+                },
+                error: function (xhr, status, err) {
+                    console.error('Failed to load initial data', err);
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadInitialData();
+        });
+
+
+
+
+
+        function sortTable(columnIndex) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("table");
+            if (!table) {
+                console.error("Table not found.");
+                return; // Stop the function if the table isn't found.
+            }
+            switching = true;
+            dir = "asc"; // Initially set the direction to ascending
+
+            // Perform the sorting loop until no more switching is needed
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+
+                // Loop through all table rows (except the first, which contains table headers)
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    // Get the two elements to compare, one from current row and one from the next
+                    x = rows[i].getElementsByTagName("TD")[columnIndex];
+                    y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
+
+                    if (!x || !y) {
+                        console.error("TD not found.");
+                        return; // Stop the function if the expected TD isn't found.
+                    }
+
+                    // Check if the two rows should switch place, depending on the direction
+                    if ((dir == "asc" && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) ||
+                        (dir == "desc" && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+
+                // If a switch has been marked, perform it and mark that a switch has been done
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++; // This is a counter for how many switches have been done
+                } else {
+                    // If no switching has been done and the direction was "asc",
+                    // set the direction to "desc" and run the while loop again.
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+
+            // Update sort arrows for all columns
+            var arrows = table.querySelectorAll('.sort-arrow');
+            arrows.forEach(function (arrow) { arrow.textContent = '↑↓'; });
+
+            // Update the current sort arrow
+            var currentArrow = table.rows[0].cells[columnIndex].querySelector('.sort-arrow');
+            if (currentArrow) {
+                currentArrow.textContent = dir === 'asc' ? '↓' : '↑';
+            } else {
+                console.error("Sort arrow not found.");
+                return; // Stop the function if the sort arrow isn't found.
+            }
+        }
+        //--------------------------------Delete---------------------------------------------------------
+
+        function deleteFromDatabase(id, row) {
+            $.ajax({
+                url: `http://localhost:5271/Person/DeleteConfirmed/${id}`,
+                type: 'POST',
+                success: function (data) {
+                    row.remove();
+                    displayNotification("Data deleted successfully", "success"); // Show success notification
+                    console.log("Data deleted successfully");
+                    var newUrl = "http://localhost:5214/person";
+                    history.pushState(null, null, newUrl);
+                },
+                error: function (xhr, status, error) {
+                    displayNotification("Error deleting data", "error"); // Show error notification
+                    console.error("Error:", error);
+                    console.log(id);
+                    console.log(row);
+                }
+            });
+        }
+
+
+
+        function handleDeleteButtonClick(buttonElement) {
+            const row = buttonElement.closest('tr');
+            const rowId = 'row-' + uuidv4();
+            const id = row.getAttribute('data-id');
+            const hidden = row.cells[0].textContent;
+            const firstName = row.cells[1].textContent;
+            const lastName = row.cells[2].textContent;
+            console.log(hidden);
+            console.log(id);
+            console.log(firstName);
+            console.log(lastName);
+            if (confirm(`Are you sure you want to delete <${hidden}${firstName}${lastName}> ?😊`)) {
+                deleteFromDatabase(id, row)
+                console.log("Data deleted");
+            } else {
+                console.log("You pressed Cancel!");
+            }
+
+
+
+        }
+
+        const table = document.getElementById('table');
+        table.addEventListener('click', function (event) {
+            if (event.target && event.target.classList.contains('bi-trash')) {
+                handleDeleteButtonClick(event.target);
+                console.log("trash click");
+
+            }
+        });
+        //--------------------------------Edit---------------------------------------------------------
+
+        function handleEditClick(event, rowIndex) {
+            const row = table.rows[rowIndex];
+            if (row) {
+                const rowId = row.getAttribute('data-id');
+                const abstractId = row.getAttribute('data-abstract-id');
+                const currentFirstName = row.cells[0].textContent;
+                const currentLastName = row.cells[1].textContent;
+                console.log(rowId);
+                console.log(abstractId);
+
+                OpenModal();
+                modalFirstName.value = currentFirstName;
+                modalLastName.value = currentLastName;
+                message.textContent = "Edit the fields you want to update.";
+
+                const saveButton = document.getElementById('saveButton');
+                console.log(abstractId);
+                saveButton.onclick = function () {
+                    const newFirstName = modalFirstName.value;
+                    console.log(newFirstName);
+                    const newLastName = modalLastName.value;
+                    updateDatabase(abstractId, newFirstName, newLastName, row);
+                    console.log(abstractId);
+                };
+            }
+        }
+
+
+
+
+              
+        function updateDatabase(abstractId, newFirstName, newLastName, row) {
+            $.ajax({
+                url: `http://localhost:5271/Person/Edit/${abstractId}`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ AbstractId: abstractId, FirstName: newFirstName, LastName: newLastName, Row: row }),
+
+                success: function (response) {
+                    // row.cells[0].textContent = newFirstName;
+                    // row.cells[1].textContent = newLastName;
+                  updateGrid(response.abstractId, response.firstName, response.lastName, row);
+                    displayNotification("Data Edited successfully", "success"); // Show success notification
+    console.log('Data updated successfully');
+    CloseModal();
+                },
+                error: function (xhr, status, err) {
+                    console.error('Failed to Edit data', err);
+                    displayNotification("Error Editing data", "error"); // Show error notification
+                }
+            });
+        }
+        document.getElementById('table').addEventListener('click', function (event) {
+            if (event.target && event.target.classList.contains('bi-pencil')) {
+                const rowIndex = event.target.closest('tr').rowIndex;
+                handleEditClick(event, rowIndex);
+            }
+        });
+
+
+       
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuidv4.min.js"></script>
+</body>
+
+</html>
+
+
+
+
+     

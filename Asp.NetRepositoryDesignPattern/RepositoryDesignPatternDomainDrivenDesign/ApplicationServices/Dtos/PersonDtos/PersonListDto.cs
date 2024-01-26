@@ -1,7 +1,7 @@
 ﻿namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Dtos.PersonDtos
 {
-    public class UpdatePersonDtoGetService
+    public class PersonListDto
     {
-        public Guid? RealId { get; set; }
+        public IEnumerable<PersonDto> People { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Dtos.PersonDtos;
 using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services;
 using RepositoryDesignPatternDomainDrivenDesign.Models.DomainModels.PersonAggregates;
+using RepositoryDesignPatternDomainDrivenDesign.Models.Services;
 using RepositoryDesignPatternDomainDrivenDesign.Models.Services.Contracts;
 
 
@@ -10,96 +11,83 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
 {
     public class PersonController : Controller
     {
+
         #region [Private State]
+        private readonly OnlineShopDbContext _onlineShopDbContext;
         private readonly ApplicationServices.Services.PersonService _personService;
         private readonly Person _person;
-      
-        #endregion
+        private readonly ILogger<PersonController> _logger;
 
+
+        #endregion
         #region [Ctor]
-        public PersonController(PersonService personService)
+        public PersonController(OnlineShopDbContext onlineShopDbContext, ILogger<PersonController> logger)
         {
-            _personService = personService;
+            _onlineShopDbContext = onlineShopDbContext;
+            _personService = new PersonService(_onlineShopDbContext);
             _person = new Person();
-           
+            _logger = logger;
+
         }
 
         #endregion
-        #region [async Task<IActionResult> Index()]
+        #region [async Task<IActionResult> Person()]
         // GET: PersonController
         [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            var selectPersonDtos = await _personService.ShowAll();
-            return View(selectPersonDtos);
-        }
-        #endregion
-
-        #region [async Task<IActionResult> Create()]
-        // GET: People/Create
-        [HttpGet]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Person()
         {
             return View();
         }
         #endregion
+        #region [async Task<IActionResult> GetAllPersonJson()]
+        [HttpGet]
+        [Route("Person/GetPersonByIdJson")]
+        public async Task<IActionResult> GetAllPersonJson()
+        {
+            var people = await _personService.ShowAllAsync();
+            return Json(people);
+        }
+        #endregion
+        #region [async Task<IActionResult> Create([FromBody]InsertPersonDtoService insertPersonDtoService]
 
-        #region [async Task<IActionResult> Create(InsertPersonDtoService insertPersonDtoService)]
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(InsertPersonDtoService insertPersonDtoService)
+        [Route("Person/Create")]
+        public async Task<IActionResult> Create([FromBody] InsertPersonDtoService insertPersonDtoService)
         {
             if (ModelState.IsValid)
             {
-                await _personService.Save(insertPersonDtoService);
-                return RedirectToAction(nameof(Index));
+                await _personService.SaveAsync(insertPersonDtoService);
+                return Ok(new { AbstractId = insertPersonDtoService.AbstractId }); // Return the AbstractId to the client
             }
             return View(insertPersonDtoService);
         }
         #endregion
-
-        #region [async Task<IActionResult> Delete(DeletePersonDtoGetService? deletePersonDtoGetService)]
-        // GET: People/Delete/5
-        [HttpGet]
-
-        public async Task<IActionResult> Delete(DeletePersonDtoGetService? deletePersonDtoGetService)
-        {
-
-            return View(deletePersonDtoGetService);
-        }
-        #endregion
-
-        #region [async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPostController deletePersonDtoPostController)]
+        #region [async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPost deletePersonDtoPost)]
         // POST: People/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [HttpPost]
+        [Route("Person/DeleteConfirmed/{id}")]
         public async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPostService deletePersonDtoPostService)
         {
-            await _personService.DeleteConfirmed(deletePersonDtoPostService);
-            return RedirectToAction(nameof(Index));
-
+            await _personService.DeleteAsync(deletePersonDtoPostService);
+            return Ok();
         }
         #endregion
+        #region [async Task<IActionResult> Edit(UpdatePersonDtoPost updatePersonDtoPost)]
 
-        #region [async Task<IActionResult> Edit(UpdatePersonDtoPostController updatePersonDtoPostController)]
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdatePersonDtoPostService updatePersonDtoPostService)
+        [Route("Person/Edit/{abstractId}")]
+        public async Task<IActionResult> Edit([FromBody] UpdatePersonDtoPostService updatePersonDtoPostService)
         {
-            await _personService.Edit(updatePersonDtoPostService);
-            return RedirectToAction(nameof(Index));
+            var realId = _personService.GetRealId(updatePersonDtoPostService.AbstractId);
+            updatePersonDtoPostService.RealId = realId ?? Guid.Empty;
+
+            await _personService.UpdateAsync(updatePersonDtoPostService);
+            return Json(new { success = true, abstractId = updatePersonDtoPostService.AbstractId, firstName = updatePersonDtoPostService.FirstName, lastName = updatePersonDtoPostService.LastName });
         }
         #endregion
 
-        #region [async Task<IActionResult> Edit(UpdatePersonDtoGet? updatePersonDtoGet)]
-        // GET: People/Edit/5
-        [HttpGet]
-        public async Task<IActionResult> Edit(UpdatePersonDtoGetService? updatePersonDtoGetService)
-        {
-
-            var person = await _personService.Edit(updatePersonDtoGetService);
-            return View(person);
-
-        }
-        #endregion
     }
 }
+
+

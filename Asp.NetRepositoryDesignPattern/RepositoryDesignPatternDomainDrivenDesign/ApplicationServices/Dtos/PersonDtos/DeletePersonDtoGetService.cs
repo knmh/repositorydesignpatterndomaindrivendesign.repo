@@ -2,6 +2,6 @@
 {
     public class DeletePersonDtoGetService
     {
-        public Guid Id { get; set; }
+        public Guid RealId { get; set; }
     }
 }
