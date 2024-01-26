@@ -7,7 +7,7 @@ using RepositoryDesignPatternDomainDrivenDesign.Models.DomainModels.ProductAggre
 
 namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
 {
-    public class ProductService
+    public class ProductService: ApplicationServices.Services.Contracts.BaseApplicationService.BaseProductApplicationService<SelectPersonDtoService, SelectPersonDtoService, SelectPersonDtoService, InsertPersonDtoService, DeletePersonDtoPostService, UpdatePersonDtoPostService>
     {
 
         #region [Private States]
@@ -48,12 +48,12 @@ namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
         #endregion
 
         #region [Save(InsertProductDtoService insertProductDto)]
-        public async Task Save(InsertProductDtoService insertProductDto)
+        public async Task Save(InsertProductDtoService insertProductDtoService)
         {
             _product.Id = null;
-            _product.Title = insertProductDto.Title;
-            _product.UnitPrice = insertProductDto.UnitPrice;
-            _product.Quantity = insertProductDto.Quantity;
+            _product.Title = insertProductDtoService.Title;
+            _product.UnitPrice = insertProductDtoService.UnitPrice;
+            _product.Quantity = insertProductDtoService.Quantity;
             await _productRepository.InsertAsync(_product);
         }
         #endregion
@@ -61,7 +61,6 @@ namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
         #region [Delete(DeleteProductDtoGetService? deleteProductDtoGetService)]
         public async Task<DeleteProductDtoGetService> Delete(DeleteProductDtoGetService? deleteProductDtoGetService)
         {
-
             _product.Id = deleteProductDtoGetService.Id;
             return deleteProductDtoGetService;
         }

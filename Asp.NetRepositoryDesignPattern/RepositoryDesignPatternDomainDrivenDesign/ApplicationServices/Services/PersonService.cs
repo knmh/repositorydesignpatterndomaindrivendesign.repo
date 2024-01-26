@@ -6,7 +6,7 @@ using RepositoryDesignPatternDomainDrivenDesign.Models.Services.Contracts;
 
 namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
 {
-    public class PersonService
+    public class PersonService:ApplicationServices.Services.Contracts.BaseApplicationService.BasePersonApplicationService<SelectPersonDtoService, SelectPersonDtoService, SelectPersonDtoService, InsertPersonDtoService, DeletePersonDtoPostService, UpdatePersonDtoPostService>
     {
         #region [Private States]
         private readonly OnlineShopDbContext _onlineShopDbContext;

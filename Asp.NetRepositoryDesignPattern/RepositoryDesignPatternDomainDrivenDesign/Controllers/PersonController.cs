@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Dtos.PersonDtos;
 using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services;
-using RepositoryDesignPatternDomainDrivenDesign.Controllers.Dtos.PersonDtos;
 using RepositoryDesignPatternDomainDrivenDesign.Models.DomainModels.PersonAggregates;
 using RepositoryDesignPatternDomainDrivenDesign.Models.Services.Contracts;
 
@@ -14,15 +13,15 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         #region [Private State]
         private readonly ApplicationServices.Services.PersonService _personService;
         private readonly Person _person;
-        private readonly IMapper _mapper;
+      
         #endregion
 
         #region [Ctor]
-        public PersonController(PersonService personService, IMapper mapper)
+        public PersonController(PersonService personService)
         {
             _personService = personService;
             _person = new Person();
-            _mapper = mapper;
+           
         }
 
         #endregion
@@ -32,11 +31,7 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         public async Task<IActionResult> Index()
         {
             var selectPersonDtos = await _personService.ShowAll();
-            var selectPersonDtoController = new SelectPersonDtoController
-            {
-                People = _mapper.Map<List<SelectPersonDtoService>>(selectPersonDtos)
-            };
-            return View(selectPersonDtoController);
+            return View(selectPersonDtos);
         }
         #endregion
 
@@ -49,30 +44,28 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         }
         #endregion
 
-        #region [async Task<IActionResult> Create(InsertPersonDtoController insetPersonDtoController)]
+        #region [async Task<IActionResult> Create(InsertPersonDtoService insertPersonDtoService)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(InsertPersonDtoController insetPersonDtoController)
+        public async Task<IActionResult> Create(InsertPersonDtoService insertPersonDtoService)
         {
             if (ModelState.IsValid)
             {
-
-                var insertPersonDtoGet = _mapper.Map<InsertPersonDtoService>(insetPersonDtoController);
-                await _personService.Save(insertPersonDtoGet);
+                await _personService.Save(insertPersonDtoService);
                 return RedirectToAction(nameof(Index));
             }
-            return View(insetPersonDtoController);
+            return View(insertPersonDtoService);
         }
         #endregion
 
-        #region [async Task<IActionResult> Delete(DeletePersonDtoGetController? deletePersonDtoGetController)]
+        #region [async Task<IActionResult> Delete(DeletePersonDtoGetService? deletePersonDtoGetService)]
         // GET: People/Delete/5
         [HttpGet]
 
-        public async Task<IActionResult> Delete(DeletePersonDtoGetController? deletePersonDtoGetController)
+        public async Task<IActionResult> Delete(DeletePersonDtoGetService? deletePersonDtoGetService)
         {
 
-            return View(deletePersonDtoGetController);
+            return View(deletePersonDtoGetService);
         }
         #endregion
 
@@ -80,10 +73,9 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         // POST: People/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPostController deletePersonDtoPostController)
+        public async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPostService deletePersonDtoPostService)
         {
-            var deletePersonDtoPost = _mapper.Map<DeletePersonDtoPostService>(deletePersonDtoPostController);
-            await _personService.DeleteConfirmed(deletePersonDtoPost);
+            await _personService.DeleteConfirmed(deletePersonDtoPostService);
             return RedirectToAction(nameof(Index));
 
         }
@@ -91,24 +83,21 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
 
         #region [async Task<IActionResult> Edit(UpdatePersonDtoPostController updatePersonDtoPostController)]
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdatePersonDtoPostController updatePersonDtoPostController)
+        public async Task<IActionResult> Edit(UpdatePersonDtoPostService updatePersonDtoPostService)
         {
-            var updatePersonDtoPost = _mapper.Map<UpdatePersonDtoPostService>(updatePersonDtoPostController);
-            await _personService.Edit(updatePersonDtoPost);
+            await _personService.Edit(updatePersonDtoPostService);
             return RedirectToAction(nameof(Index));
         }
         #endregion
 
-        #region [async Task<IActionResult> Edit(UpdatePersonDtoGetController? updatePersonDtoGetController)]
+        #region [async Task<IActionResult> Edit(UpdatePersonDtoGet? updatePersonDtoGet)]
         // GET: People/Edit/5
         [HttpGet]
-        public async Task<IActionResult> Edit(UpdatePersonDtoGetController? updatePersonDtoGetController)
+        public async Task<IActionResult> Edit(UpdatePersonDtoGetService? updatePersonDtoGetService)
         {
 
-            var updatePersonDtoGet = _mapper.Map<UpdatePersonDtoGetService>(updatePersonDtoGetController);
-            var person = await _personService.Edit(updatePersonDtoGet);
-            var updatePersonDtoPostController = _mapper.Map<UpdatePersonDtoPostController>(person);
-            return View(updatePersonDtoPostController);
+            var person = await _personService.Edit(updatePersonDtoGetService);
+            return View(person);
 
         }
         #endregion

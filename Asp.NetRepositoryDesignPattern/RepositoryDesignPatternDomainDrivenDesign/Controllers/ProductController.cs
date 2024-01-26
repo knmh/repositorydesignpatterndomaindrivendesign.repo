@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Dtos.PersonDtos;
 using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Dtos.ProductDtos;
 using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services;
-using RepositoryDesignPatternDomainDrivenDesign.Controllers.Dtos.ProductDtos;
 using RepositoryDesignPatternDomainDrivenDesign.Models.DomainModels.ProductAggregates;
 using RepositoryDesignPatternDomainDrivenDesign.Models.Services.Contracts;
 
@@ -14,39 +14,37 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         #region [Private State]
         private readonly ApplicationServices.Services.ProductService _productService;
         private readonly Product _product;
-        private readonly IMapper _mapper;
+  
         #endregion
 
         #region [Ctor]
-        public ProductController(ProductService productService, IMapper mapper)
+        public ProductController(ProductService productService)
         {
             _productService = productService;
             _product = new Product();
-            _mapper = mapper;
+        
         }
 
         #endregion
 
-        #region [Task<IActionResult> Edit(UpdateProductDtoPostController updateProductDtoPostController)]
+        #region [Task<IActionResult> Edit(UpdateProductDtoPost updateProductDtoPost)]
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateProductDtoPostController updateProductDtoPostController)
+        public async Task<IActionResult> Edit(UpdateProductDtoPostService updateProductDtoPostService)
         {
-            var updateProductDtoPost = _mapper.Map<UpdateProductDtoPostService>(updateProductDtoPostController);
-            await _productService.Edit(updateProductDtoPost);
+            await _productService.Edit(updateProductDtoPostService);
             return RedirectToAction(nameof(Index));
-        }
+         }
 
         #endregion
 
-        #region [Task<IActionResult> Edit(UpdateProductDtoGetController? updateProductDtoGetController)]
+        #region [Task<IActionResult> Edit(UpdateProductDtoGet? updateProductDtoGet)]
         // GET: products/Edit/5
         [HttpGet]
-        public async Task<IActionResult> Edit(UpdateProductDtoGetController? updateProductDtoGetController)
+        public async Task<IActionResult> Edit(UpdateProductDtoGetService? updateProductDtoGetService)
         {
-            var updateProductDtoGet = _mapper.Map<UpdateProductDtoGetService>(updateProductDtoGetController);
-            var product = await _productService.Edit(updateProductDtoGet);
-            var updateProductDtoPostController = _mapper.Map<UpdateProductDtoPostController>(product);
-            return View(updateProductDtoPostController);
+            var product = await _productService.Edit(updateProductDtoGetService);
+            return View(product);
+           
         }
         #endregion
 
@@ -55,14 +53,9 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-
+        
             var selectProductDtos = await _productService.ShowAll();
-            var selectProductDtoController = new SelectProductDtoController
-            {
-                Products = _mapper.Map<List<SelectProductDtoService>>(selectProductDtos)
-            };
-
-            return View(selectProductDtoController);
+            return View(selectProductDtos);
         }
         #endregion
 
@@ -75,44 +68,46 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         }
         #endregion
 
-        #region [Task<IActionResult> Create(InsertProductDtoController insertProductDtoController)]
+        #region [Task<IActionResult> Create(InsertProductDto insertProductDto)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(InsertProductDtoController insertProductDtoController)
+        public async Task<IActionResult> Create(InsertProductDtoService insertProductDtoService)
         {
             if (ModelState.IsValid)
             {
 
-                var insertProductDtoGet = _mapper.Map<InsertProductDtoService>(insertProductDtoController);
-                await _productService.Save(insertProductDtoGet);
+                await _productService.Save(insertProductDtoService);
                 return RedirectToAction(nameof(Index));
             }
-            return View(insertProductDtoController);
+            return View(insertProductDtoService);
+
 
         }
         #endregion
 
-        #region [Task<IActionResult> Delete(DeleteProductDtoGetController? deleteProductDtoGetController)]
+        #region [Task<IActionResult> Delete(DeleteProductDtoGet? deleteProductDtoGet)]
         // GET:Products/Delete/5
         [HttpGet]
-        public async Task<IActionResult> Delete(DeleteProductDtoGetController? deleteProductDtoGetController)
+        public async Task<IActionResult> Delete(DeleteProductDtoGetService? deleteProductDtoGetService)
         {
 
-            return View(deleteProductDtoGetController);
+            return View(deleteProductDtoGetService);
         }
         #endregion
 
-        #region [Task<IActionResult> DeleteConfirmed(DeleteProductDtoPostController deleteProductDtoPostController)]
+        #region [Task<IActionResult> DeleteConfirmed(DeleteProductDtoPost deleteProductDtoPost)]
         // POST:Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(DeleteProductDtoPostController deleteProductDtoPostController)
+        public async Task<IActionResult> DeleteConfirmed(DeleteProductDtoPostService deleteProductDtoPostService)
         {
-            var deleteProductDtoPost = _mapper.Map<DeleteProductDtoPostService>(deleteProductDtoPostController);
-            await _productService.DeleteConfirmed(deleteProductDtoPost);
+            await _productService.DeleteConfirmed(deleteProductDtoPostService);
             return RedirectToAction(nameof(Index));
+
+
         }
         #endregion
     }
 }
+
 

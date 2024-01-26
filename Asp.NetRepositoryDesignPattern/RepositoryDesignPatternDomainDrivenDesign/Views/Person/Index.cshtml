@@ -1,4 +1,4 @@
-﻿@model RepositoryDesignPatternDomainDrivenDesign.Controllers.Dtos.PersonDtos.SelectPersonDtoController
+﻿@model IEnumerable< RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Dtos.PersonDtos.SelectPersonDtoService>
 
 
 
@@ -24,7 +24,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.People)
+        @foreach (var item in Model)
         {
             <tr>
                 <td>
