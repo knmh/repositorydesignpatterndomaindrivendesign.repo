@@ -373,82 +373,10 @@
             }
         }
 
-       
-      
-
-        /////////////////////////////////////////////////////////////
-
-        function handleSaveButtonClick() {
-            formValidation();
-            const firstName = firstNameInput.value.trim();
-            const lastName = lastNameInput.value.trim();
-
-            if (firstName && lastName) {
-
-                saveToDatabase(firstName, lastName);
-               
-                firstNameInput.value = "";
-                lastNameInput.value = "";
-            }
-        }
-
-        function formValidation() {
-            const firstNamevalue = firstNameInput.value.trim();
-            const lastNamevalue = lastNameInput.value.trim();
-
-            if (!firstNamevalue) {
-                firstNameMsg.textContent = "First name is required";
-            } else {
-                firstNameMsg.textContent = "";
-            }
-            if (!lastNamevalue) {
-                lastNameMsg.textContent = "Last name is required";
-            } else {
-                lastNameMsg.textContent = "";
-            }
-        }
-
-        function saveToDatabase(firstName, lastName, rowIndex) {
-            $.ajax({
-                url: `http://localhost:5271/Person/Create`,
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ FirstName: firstName, LastName: lastName, RowIndex: rowIndex }),
-                success: function (response) {
-                    updateGrid(response.abstractId, firstName, lastName);
-                    showMessage(`Saved successfully: ${firstName} ${lastName}`, 'success');
-                },
-                error: function (xhr) {
-                    const errorMessage = xhr.responseJSON?.message || 'Failed to save data';
-                    showMessage(errorMessage, 'error');
-                }
-            });
-        }
-
-        function displayNotification(message, type) {
-            const notificationContainer = document.getElementById('notificationContainer');
-            const notificationMessage = document.createElement('div');
-            notificationMessage.classList.add('notification-message');
-
-            if (type === 'success') {
-                notificationMessage.classList.add('success');
-            } else if (type === 'error') {
-                notificationMessage.classList.add('error');
-            }
-
-            notificationMessage.textContent = message;
-            notificationContainer.appendChild(notificationMessage);
-
-            // Automatically remove the notification after 3 seconds
-            setTimeout(() => notificationContainer.removeChild(notificationMessage), 3000);
-        }
-        function showMessage(text, type) {
-            displayNotification(text, type);
-        }
-
 
 
         //----------------------------------loadInitialData----------
+       
         function loadInitialData() {
             $.ajax({
                 url: `http://localhost:5271/Person/GetPersonByIdJson`,
@@ -536,6 +464,78 @@
                 return; // Stop the function if the sort arrow isn't found.
             }
         }
+        /////////////////////////////////////////////////////////////
+
+        function handleSaveButtonClick() {
+            formValidation();
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
+
+            if (firstName && lastName) {
+
+                saveToDatabase(firstName, lastName);
+               
+                firstNameInput.value = "";
+                lastNameInput.value = "";
+            }
+        }
+
+        function formValidation() {
+            const firstNamevalue = firstNameInput.value.trim();
+            const lastNamevalue = lastNameInput.value.trim();
+
+            if (!firstNamevalue) {
+                firstNameMsg.textContent = "First name is required";
+            } else {
+                firstNameMsg.textContent = "";
+            }
+            if (!lastNamevalue) {
+                lastNameMsg.textContent = "Last name is required";
+            } else {
+                lastNameMsg.textContent = "";
+            }
+        }
+
+        function saveToDatabase(firstName, lastName, rowIndex) {
+            $.ajax({
+                url: `http://localhost:5271/Person/Create`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ FirstName: firstName, LastName: lastName, RowIndex: rowIndex }),
+                success: function (response) {
+                    updateGrid(response.abstractId, firstName, lastName);
+                    showMessage(`Saved successfully: ${firstName} ${lastName}`, 'success');
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseJSON?.message || 'Failed to save data';
+                    showMessage(errorMessage, 'error');
+                }
+            });
+        }
+
+        function displayNotification(message, type) {
+            const notificationContainer = document.getElementById('notificationContainer');
+            const notificationMessage = document.createElement('div');
+            notificationMessage.classList.add('notification-message');
+
+            if (type === 'success') {
+                notificationMessage.classList.add('success');
+            } else if (type === 'error') {
+                notificationMessage.classList.add('error');
+            }
+
+            notificationMessage.textContent = message;
+            notificationContainer.appendChild(notificationMessage);
+
+            setTimeout(() => notificationContainer.removeChild(notificationMessage), 3000);
+        }
+        function showMessage(text, type) {
+            displayNotification(text, type);
+        }
+
+
+
+       
         //--------------------------------Delete---------------------------------------------------------
 
         function deleteFromDatabase(id, row) {
@@ -544,13 +544,13 @@
                 type: 'POST',
                 success: function (data) {
                     row.remove();
-                    displayNotification("Data deleted successfully", "success"); // Show success notification
+                    displayNotification("Data deleted successfully", "success"); 
                     console.log("Data deleted successfully");
-                    var newUrl = "http://localhost:5214/person";
-                    history.pushState(null, null, newUrl);
+                    // var newUrl = "http://localhost:5214/person";
+                    // history.pushState(null, null, newUrl);
                 },
                 error: function (xhr, status, error) {
-                    displayNotification("Error deleting data", "error"); // Show error notification
+                    displayNotification("Error deleting data", "error"); 
                     console.error("Error:", error);
                     console.log(id);
                     console.log(row);
@@ -577,8 +577,6 @@
             } else {
                 console.log("You pressed Cancel!");
             }
-
-
 
         }
 
@@ -618,10 +616,6 @@
                 };
             }
         }
-
-
-
-
               
         function updateDatabase(abstractId, newFirstName, newLastName, row) {
             $.ajax({
@@ -635,8 +629,8 @@
                     // row.cells[1].textContent = newLastName;
                   updateGrid(response.abstractId, response.firstName, response.lastName, row);
                     displayNotification("Data Edited successfully", "success"); // Show success notification
-    console.log('Data updated successfully');
-    CloseModal();
+                    console.log('Data updated successfully');
+                                CloseModal();
                 },
                 error: function (xhr, status, err) {
                     console.error('Failed to Edit data', err);
@@ -651,8 +645,6 @@
             }
         });
 
-
-       
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuidv4.min.js"></script>

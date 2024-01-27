@@ -1,20 +1,25 @@
-﻿namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services.Contracts.IApplicationService
+﻿using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Dtos.PersonDtos;
+
+namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services.Contracts.IApplicationService
 {
-    public interface IApplicationService<TSelectByIdAsync, USelectByIdAsync, TSelectAllAsync, TInsertAsync, TDeleteAsync, TUpdateAsync>
+    public interface IApplicationService<TSelectByIdAsync, USelectByIdAsync, TSelectAllAsync, TInsertAsync, TDeleteAsync, TUpdateAsync, TCreateAbstractId, TGetRealId>
     {
 
-        // Task<IEnumerable<TGetPersonByIdAsync>> ShowPersonByIdAsync();
         Task<TSelectByIdAsync> SelectByIdAsync(USelectByIdAsync? id);
 
         Task<IEnumerable<TSelectAllAsync>> ShowAllAsync();
 
-        Task SaveAsync(TInsertAsync entity);
+        Task SaveAsync(TInsertAsync SaveDto);
 
-        Task DeleteAsync(TDeleteAsync entity);
+        Task DeleteAsync(TDeleteAsync deleteDto);
 
-        Task UpdateAsync(TUpdateAsync entity);
+        Task UpdateAsync(TUpdateAsync updateDto);
 
-        //Task<IEnumerable<TFillIdMapper>> FillIdMapper();
+        Task PopulateIdMappingsFromDatabase();
+
+        Task CreateAbstractId(TCreateAbstractId createAbstractIdDto);
+
+        Task GetRealId(TGetRealId getRealIdDto);
 
 
 

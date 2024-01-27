@@ -19,7 +19,7 @@ builder.Services.AddDbContextPool<OnlineShopDbContext>(
     ));
 builder.Services.AddScoped<IPersonRepository<Person, Guid?>, PersonRepository<Person, Guid?>>();
 //builder.Services.AddScoped<IProductRepository<Product, Guid?>, ProductRepository<Product, Guid?>>();
-builder.Services.AddScoped<IPersonApplicationService<SelectPersonDtoService, SelectPersonDtoService, SelectPersonDtoService, InsertPersonDtoService, DeletePersonDtoPostService, UpdatePersonDtoPostService>, PersonService>();
+builder.Services.AddScoped<IPersonApplicationService<SelectPersonDtoService, SelectPersonDtoService, SelectPersonDtoService, InsertPersonDtoService, DeletePersonDtoPostService, UpdatePersonDtoPostService, CreateAbstractIdPersonDtoService, GetRealIdPersonDtoService>, PersonService>();
 
 
 

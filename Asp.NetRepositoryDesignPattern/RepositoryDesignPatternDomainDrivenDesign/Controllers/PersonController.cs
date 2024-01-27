@@ -79,14 +79,27 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
         [Route("Person/Edit/{abstractId}")]
         public async Task<IActionResult> Edit([FromBody] UpdatePersonDtoPostService updatePersonDtoPostService)
         {
-            var realId = _personService.GetRealId(updatePersonDtoPostService.AbstractId);
+            // Create an instance of GetRealIdPersonDtoService with the AbstractId
+            var getRealIdDto = new GetRealIdPersonDtoService
+            {
+                // Assume there is a property named AbstractId in GetRealIdPersonDtoService
+                AbstractId = updatePersonDtoPostService.AbstractId
+            };
+
+            // Now pass the getRealIdDto to the GetRealId method
+            var realId = _personService.GetRealId(getRealIdDto);
             updatePersonDtoPostService.RealId = realId ?? Guid.Empty;
 
             await _personService.UpdateAsync(updatePersonDtoPostService);
-            return Json(new { success = true, abstractId = updatePersonDtoPostService.AbstractId, firstName = updatePersonDtoPostService.FirstName, lastName = updatePersonDtoPostService.LastName });
+            return Json(new
+            {
+                success = true,
+                abstractId = updatePersonDtoPostService.AbstractId,
+                firstName = updatePersonDtoPostService.FirstName,
+                lastName = updatePersonDtoPostService.LastName
+            });
         }
         #endregion
-
     }
 }
 

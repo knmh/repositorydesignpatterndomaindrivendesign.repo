@@ -2,8 +2,8 @@
 
 namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services.Contracts
 {
-    public interface IPersonApplicationService<TSelectByIdAsync, USelectByIdAsync, TSelectAllAsync, TInsertAsync, TDeleteAsync, TUpdateAsync>
-          : IApplicationService<TSelectByIdAsync, USelectByIdAsync, TSelectAllAsync, TInsertAsync, TDeleteAsync, TUpdateAsync>
+    public interface IPersonApplicationService<TSelectByIdAsync, USelectByIdAsync, TSelectAllAsync, TInsertAsync, TDeleteAsync, TUpdateAsync, TCreateAbstractId, TGetRealId>
+          : IApplicationService<TSelectByIdAsync, USelectByIdAsync, TSelectAllAsync, TInsertAsync, TDeleteAsync, TUpdateAsync, TCreateAbstractId, TGetRealId>
 
 
           where TSelectByIdAsync : class
@@ -12,6 +12,8 @@ namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
           where TInsertAsync : class
           where TDeleteAsync : class
           where TUpdateAsync : class
+          where TCreateAbstractId : class
+          where TGetRealId : class
 
     {
     }

@@ -7,7 +7,7 @@ using RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services.Con
 
 namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
 {
-    public class PersonService : BasePersonApplicationService<SelectPersonDtoService, SelectPersonDtoService, SelectPersonDtoService, InsertPersonDtoService, DeletePersonDtoPostService, UpdatePersonDtoPostService>
+    public class PersonService : BasePersonApplicationService<SelectPersonDtoService, SelectPersonDtoService, SelectPersonDtoService, InsertPersonDtoService, DeletePersonDtoPostService, UpdatePersonDtoPostService,CreateAbstractIdPersonDtoService,GetRealIdPersonDtoService>
 
     {
         #region [Private States]
@@ -23,40 +23,15 @@ namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
             _onlineShopDbContext = onlineShopDbContext;
             _personRepository = new PersonRepository<Person, Guid>(_onlineShopDbContext);
             _person = new Person();
-
             PopulateIdMappingsFromDatabase();
         }
         #endregion
-
-
-        //#region [ShowAll()]
-        //public async Task<List<SelectPersonDtoService>> ShowAllAsync()
-        //{
-        //    var people = await _personRepository.SelectAllAsync();
-        //    var selectPersonDtos = new List<SelectPersonDtoService>();
-
-        //    foreach (var person in people)
-        //    {
-        //        var abstractId = CreateAbstractId(person); // Pass the Person object to CreateAbstractId method
-
-        //        var selectPersonDto = new SelectPersonDtoService()
-        //        {
-        //            Id = new Guid(abstractId), // Convert the abstractId string to Guid
-        //            FirstName = person.FirstName,
-        //            LastName = person.LastName,
-        //        };
-        //        selectPersonDtos.Add(selectPersonDto);
-        //    }
-
-        //    return selectPersonDtos;
-        //}
-        //#endregion
         #region [SaveAsync(InsertPersonDtoService insertPersonDtoService))]
         public async Task SaveAsync(InsertPersonDtoService insertPersonDtoService)
         {
-            _person.Id = Guid.NewGuid();
-            _person.AbstractId = Guid.NewGuid().ToString(); // Generate a unique AbstractId
-            insertPersonDtoService.AbstractId = _person.AbstractId; // Set it back to the DTO if needed
+           // _person.Id = Guid.NewGuid();
+            _person.AbstractId = Guid.NewGuid().ToString();
+            insertPersonDtoService.AbstractId = _person.AbstractId; 
             _person.FirstName = insertPersonDtoService.FirstName;
             _person.LastName = insertPersonDtoService.LastName;
             await _personRepository.InsertAsync(_person);
@@ -66,8 +41,13 @@ namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
 
         public async Task DeleteAsync(DeletePersonDtoPostService deletePersonDtoPostService)
         {
-            _person.Id = deletePersonDtoPostService.RealId;
-            await _personRepository.DeleteAsync(_person);
+            //_person.Id = deletePersonDtoPostService.RealId;
+            //await _personRepository.DeleteAsync(_person);
+            var person = await _personRepository.SelectByIdAsync(deletePersonDtoPostService.RealId);
+            if (person != null)
+            {
+                await _personRepository.DeleteAsync(person);
+            }
         }
         #endregion
         #region [ShowAllAsync()]
@@ -91,86 +71,46 @@ namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
             return PersonDtos;
         }
         #endregion
-
-
-        private async Task<Person> GetPersonAsync(Guid personId)
-        {
-            // Retrieve the person from the database using the personId
-            var person = await _personRepository.SelectByIdAsync(personId);
-
-            // If the person is not null, assign the personId value to the person.Id property
-            if (person != null)
-            {
-                person.Id = personId;
-            }
-
-            return person;
-        }
-
-
-        //public async Task FillIdMapper()
-        //{
-        //    using (var context = new OnlineShopDbContext())
-        //    {
-        //        var persons = await context.Person.ToListAsync();
-
-        //        foreach (var person in persons)
-        //        {
-        //            if (person.Id != null)
-        //            {
-        //                _idMappings.Add(person.Id.ToString(), person.Id.GetValueOrDefault());
-        //            }
-        //            else
-        //            {
-        //                throw new InvalidOperationException("Person's Id cannot be null.");
-        //            }
-        //        }
-        //    }
-        //}
-        private void PopulateIdMappingsFromDatabase()
+        #region [PopulateIdMappingsFromDatabase()]
+        public void PopulateIdMappingsFromDatabase()
         {
             var mappings = _onlineShopDbContext.Person.ToDictionary(row => row.AbstractId, row => row.Id);
             _idMappings = mappings;
-
-            // Add a console log to check the count of mappings
             Console.WriteLine($"Number of mappings retrieved: {_idMappings.Count}");
 
         }
-
-        public string CreateAbstractId(Person person)
+        #endregion
+        #region [CreateAbstractId(CreateAbstractIdPersonDtoService createAbstractIdPersonDtoService)]
+        public string CreateAbstractId(CreateAbstractIdPersonDtoService createAbstractIdPersonDtoService)
         {
-            var abstractId = Guid.NewGuid().ToString(); // Generate a unique AbstractId
-            _idMappings[abstractId] = person.Id ?? throw new ArgumentException("Person's Id cannot be null"); // Store the mapping
+            var abstractId = Guid.NewGuid().ToString();
+            _idMappings[abstractId] = createAbstractIdPersonDtoService.RealId ?? throw new ArgumentException("Person's Id cannot be null");
             return abstractId;
 
-
         }
-
-
-
-        public Guid? GetRealId(string abstractId)
+        #endregion
+        #region [GetRealId(GetRealIdPersonDtoService getRealIdPersonDtoService)]
+        public Guid? GetRealId(GetRealIdPersonDtoService getRealIdPersonDtoService)
         {
-            if (Guid.TryParse(abstractId, out Guid abstractGuid))
+            if (Guid.TryParse(getRealIdPersonDtoService.AbstractId, out Guid abstractGuid))
             {
-                if (_idMappings.TryGetValue(abstractGuid.ToString(), out var realId))
+                if (_idMappings.TryGetValue(getRealIdPersonDtoService.AbstractId, out var realId))
                 {
                     return realId;
                 }
                 else
                 {
-                    // Fallback to database check
-                    var person = _onlineShopDbContext.Person.FirstOrDefault(p => p.AbstractId == abstractId);
+                    var person = _onlineShopDbContext.Person.FirstOrDefault(p => p.AbstractId == getRealIdPersonDtoService.AbstractId);
                     if (person != null)
                     {
-                        _idMappings[abstractId] = person.Id; // Update the dictionary
+                        _idMappings[getRealIdPersonDtoService.AbstractId] = person.Id;
                         return person.Id;
                     }
                 }
             }
             throw new ArgumentException("Invalid or missing identifier.");
-
         }
-
+        #endregion
         #region [Edit(UpdatePersonDtoPostService updatePersonDtoPostService)]
         public async Task UpdateAsync(UpdatePersonDtoPostService updatePersonDtoPostService)
         {
@@ -179,79 +119,34 @@ namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
                 throw new ArgumentNullException(nameof(updatePersonDtoPostService.AbstractId));
             }
 
-            Guid? realId = GetRealId(updatePersonDtoPostService.AbstractId);
-
-            var person = await _personRepository.SelectByIdAsync(realId);
-            if (person != null)
+            var getRealIdPersonDtoService = new GetRealIdPersonDtoService
             {
-                person.FirstName = updatePersonDtoPostService.FirstName;
-                person.LastName = updatePersonDtoPostService.LastName;
+                AbstractId = updatePersonDtoPostService.AbstractId
+            };
 
-                await _personRepository.UpdateAsync(person);
+            Guid? realId = GetRealId(getRealIdPersonDtoService);
+
+            if (realId.HasValue)
+            {
+                var person = await _personRepository.SelectByIdAsync(realId.Value);
+                if (person != null)
+                {
+                    person.FirstName = updatePersonDtoPostService.FirstName;
+                    person.LastName = updatePersonDtoPostService.LastName;
+
+                    await _personRepository.UpdateAsync(person);
+                }
+                else
+                {
+                    throw new ArgumentException("Person not found.");
+                }
             }
             else
             {
-                throw new ArgumentException("Person not found.");
+                throw new ArgumentException("Person real ID not found.");
             }
         }
         #endregion
-
-
-        #region [Edit(UpdatePersonDtoGetService? updatePersonDtoGetService)]
-
-        public async Task<UpdatePersonDtoPostService> UpdateGetAsync(UpdatePersonDtoGetService? updatePersonDtoGetService)
-        {
-            if (updatePersonDtoGetService?.RealId == null)
-            {
-                throw new ArgumentNullException(nameof(updatePersonDtoGetService.RealId));
-            }
-
-            var person = await _personRepository.SelectByIdAsync(updatePersonDtoGetService.RealId.Value);
-            if (person == null)
-            {
-                throw new ArgumentException("Person not found.");
-            }
-
-            var abstractId = CreateAbstractId(person);
-
-            var updatePersonDtoService = new UpdatePersonDtoPostService
-            {
-                AbstractId = abstractId,
-                FirstName = person.FirstName,
-                LastName = person.LastName
-            };
-
-            return updatePersonDtoService;
-        }
-        #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //#region [Delete(DeletePersonDtoGet? deletePersonDtoGet)]
-        //public async Task<DeletePersonDtoGetService> DeleteGetAsync(DeletePersonDtoGetService? deletePersonDtoGetService)
-        //{
-        //    _person.Id = deletePersonDtoGetService.Id;
-        //     return deletePersonDtoGetService;
-        //}
-
 
 
     }
