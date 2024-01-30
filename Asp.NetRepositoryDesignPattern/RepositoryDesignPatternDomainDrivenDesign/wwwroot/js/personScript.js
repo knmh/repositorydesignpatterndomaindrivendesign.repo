@@ -23,39 +23,19 @@
         var message = document.getElementById("modalMessage");
 
 
-class ModalCl {
-    constructor() {
-        this.modal = document.querySelector('.modal-container.hidden');
-        this.overlay = document.querySelector('.overlay.hidden');
-        this.cancelBtn = document.querySelector('.buttonCancel');
-        this.saveBtn = document.querySelector('.buttonSave');
-        this.message = document.getElementById("modalMessage");
-        this.cancelBtn.addEventListener('click', () => this.Close());
-        this.overlay.addEventListener('click', () => this.Close());
-        this.saveBtn.addEventListener('click', () => this.Save());
-    }
-
-    Close() {
-        this.modal.style.display = "none";
-        this.overlay.style.display = "none";
-        console.log('hiddenadded');
-    }
-
-    Open() {
-        this.modal.style.display = "block";
-        this.overlay.style.display = "block";
-        console.log('hiddenremoved');
-    }
-
-    Save() {
-        const newFirstName = modalFirstName.value;
-        const newLastName = modalLastName.value;
-        const abstractId = this.modal.getAttribute('data-abstract-id');
-        const row = this.modal.getAttribute('data-row');
-        updateDatabase(abstractId, newFirstName, newLastName, row, this);
-    }
+const CloseModal = function () {
+    modal.style.display = "none";
+    overlay.style.display = "none";
+    console.log('hiddenadded');
+}
+const OpenModal = function () {
+    modal.classList.remove('hidden');
+    overlay.classList.remove('hidden');
+    console.log('hiddenremoved');
 }
 
+cancelBtn.addEventListener('click', CloseModal);
+overlay.addEventListener('click', CloseModal);
 
             // // Abstract Identifiers: This approach involves using substitute identifiers to represent real IDs, especially in client - side and front - end development.It helps obfuscate sensitive information from being directly exposed to the UI and potentially to end - users.
             // // Obfuscation: Obfuscation entails intentionally making code or data difficult to understand.It's commonly used to protect software from reverse engineering or to conceal its logic and algorithms. This technique involves altering the code's structure or using complex transformations to
@@ -338,9 +318,12 @@ table.addEventListener('click', function (event) {
 
     }
 }, { once: true });
+
+
         //--------------------------------Edit---------------------------------------------------------
+
 function handleEditClick(event, rowIndex) {
-    const row = event.target.closest('tr');
+    const row = table.rows[rowIndex];
     if (row) {
         const rowId = row.getAttribute('data-id');
         const abstractId = row.getAttribute('data-abstract-id');
@@ -349,46 +332,23 @@ function handleEditClick(event, rowIndex) {
         console.log(rowId);
         console.log(abstractId);
 
-        const modal = new ModalCl();
-        modal.Open();
-        modal.setFieldValues(currentFirstName, currentLastName);
-        modal.setMessage("Edit the fields you want to update.");
-
-        modal.setSaveCallback((newFirstName, newLastName) => {
-            updateDatabase(abstractId, newFirstName, newLastName, row, modal);
-        });
-    }
-}
-
-function handleEditClick(event, rowIndex,modal) {
-    const row = event.target.closest('tr');
-    if (row) {
-        const rowId = row.getAttribute('data-id');
-        const abstractId = row.getAttribute('data-abstract-id');
-        const currentFirstName = row.cells[0].textContent;
-        const currentLastName = row.cells[1].textContent;
-        console.log(rowId);
-        console.log(abstractId);
-      
-        modal.Open();
+        OpenModal();
         modalFirstName.value = currentFirstName;
         modalLastName.value = currentLastName;
         message.textContent = "Edit the fields you want to update.";
 
-        //const saveButton = document.getElementById('saveButton');
-        //console.log(abstractId);
-        //saveButton.onclick = function () {
-        //const newFirstName = modalFirstName.value;
-        //console.log(newFirstName);
-        //const newLastName = modalLastName.value;
-        //updateDatabase(abstractId, newFirstName, newLastName, row);
-        //console.log(abstractId);
-
+        const saveButton = document.getElementById('saveButton');
+        console.log(abstractId);
+        saveButton.onclick = function () {
+            const newFirstName = modalFirstName.value;
+            console.log(newFirstName);
+            const newLastName = modalLastName.value;
+            updateDatabase(abstractId, newFirstName, newLastName, row);
+            console.log(abstractId);
         };
     }
-
-              
-function updateDatabase(abstractId, newFirstName, newLastName, row,modal) {
+}
+function updateDatabase(abstractId, newFirstName, newLastName, row) {
     $.ajax({
         url: `http://localhost:5271/Person/Edit/${abstractId}`,
         type: 'POST',
@@ -396,11 +356,12 @@ function updateDatabase(abstractId, newFirstName, newLastName, row,modal) {
         data: JSON.stringify({ AbstractId: abstractId, FirstName: newFirstName, LastName: newLastName, Row: row }),
 
         success: function (response) {
+            // row.cells[0].textContent = newFirstName;
+            // row.cells[1].textContent = newLastName;
             updateGrid(response.abstractId, response.firstName, response.lastName, row);
             displayNotification("Data Edited successfully", "success"); // Show success notification
             console.log('Data updated successfully');
-            const modal = new ModalCl();
-            modal.Close();
+            CloseModal();
         },
         error: function (xhr, status, err) {
             console.error('Failed to Edit data', err);
@@ -408,12 +369,9 @@ function updateDatabase(abstractId, newFirstName, newLastName, row,modal) {
         }
     });
 }
-   document.addEventListener('click', function (event) {
+document.getElementById('table').addEventListener('click', function (event) {
     if (event.target && event.target.classList.contains('bi-pencil')) {
         const rowIndex = event.target.closest('tr').rowIndex;
-        const modalInstance = new ModalCl(); // Create a new instance here
-        handleEditClick(event, rowIndex, modalInstance);
+        handleEditClick(event, rowIndex);
     }
-   });
-
-
+});
