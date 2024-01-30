@@ -10,7 +10,7 @@
 
         //Task DeleteAsync(U? id);
 
-        Task DeleteAsync(T entity);
+        Task<bool> DeleteAsync(T entity);
 
         // Task UpdateAsync(U id, T t);
 

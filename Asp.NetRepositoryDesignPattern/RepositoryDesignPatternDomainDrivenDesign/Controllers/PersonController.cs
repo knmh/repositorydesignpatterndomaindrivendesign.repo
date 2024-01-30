@@ -48,55 +48,64 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Controllers
             return Json(people);
         }
         #endregion
-        #region [async Task<IActionResult> Create([FromBody]InsertPersonDtoService insertPersonDtoService]
+        #region [async Task<IActionResult> Create([FromBody]InsertPersonDtoService model]
 
 
         [HttpPost]
         [Route("Person/Create")]
-        public async Task<IActionResult> Create([FromBody] InsertPersonDtoService insertPersonDtoService)
+        public async Task<IActionResult> Create([FromBody] InsertPersonDtoService model)
         {
             if (ModelState.IsValid)
             {
-                await _personService.SaveAsync(insertPersonDtoService);
-                return Ok(new { AbstractId = insertPersonDtoService.AbstractId }); // Return the AbstractId to the client
+                await _personService.SaveAsync(model);
+                return Ok(new { AbstractId = model.AbstractId }); // Return the AbstractId to the client
             }
-            return View(insertPersonDtoService);
+            return View(model);
         }
         #endregion
-        #region [async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPost deletePersonDtoPost)]
+        #region [async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPost model)]
         // POST: People/Delete/5
         [HttpPost]
-        [Route("Person/DeleteConfirmed/{id}")]
-        public async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPostService deletePersonDtoPostService)
+        [Route("Person/DeleteConfirmed/{abstractId}")]
+        public async Task<IActionResult> DeleteConfirmed(DeletePersonDtoPostService model)
         {
-            await _personService.DeleteAsync(deletePersonDtoPostService);
-            return Ok();
+            var realId = _personService.GetRealId(new GetRealIdPersonDtoService { AbstractId = model.AbstractId });
+            if (realId.HasValue)
+            {
+                var result = await _personService.DeleteAsync(new DeletePersonDtoPostService { AbstractId = model.AbstractId });
+                if (result)
+                {
+                    return Ok(new { success = true });
+                }
+            }
+            return BadRequest(new { success = false, message = "Deletion failed." });
         }
         #endregion
-        #region [async Task<IActionResult> Edit(UpdatePersonDtoPost updatePersonDtoPost)]
+        #region [async Task<IActionResult> Edit(UpdatePersonDtoPost model)]
+
 
         [HttpPost]
         [Route("Person/Edit/{abstractId}")]
-        public async Task<IActionResult> Edit([FromBody] UpdatePersonDtoPostService updatePersonDtoPostService)
+        public async Task<IActionResult> Edit([FromBody] UpdatePersonDtoPostService model)
         {
             // Create an instance of GetRealIdPersonDtoService with the AbstractId
             var getRealIdDto = new GetRealIdPersonDtoService
             {
                 // Assume there is a property named AbstractId in GetRealIdPersonDtoService
-                AbstractId = updatePersonDtoPostService.AbstractId
+                AbstractId = model.AbstractId
             };
 
             // Now pass the getRealIdDto to the GetRealId method
             var realId = _personService.GetRealId(getRealIdDto);
-            updatePersonDtoPostService.RealId = realId ?? Guid.Empty;
+            model.RealId = realId ?? Guid.Empty;
 
-            await _personService.UpdateAsync(updatePersonDtoPostService);
+            await _personService.UpdateAsync(model);
             return Json(new
             {
                 success = true,
-                abstractId = updatePersonDtoPostService.AbstractId,
-                firstName = updatePersonDtoPostService.FirstName,
-                lastName = updatePersonDtoPostService.LastName
+                abstractId = model.AbstractId,
+                firstName = model.FirstName,
+                lastName = model.LastName
             });
         }
         #endregion

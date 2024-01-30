@@ -91,69 +91,70 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Models.Services.Repositories
 
         #endregion
 
-        #region [DeleteAsync(Guid? id)]
-        public async Task DeleteAsync(Guid? id)
-        {
-            using (_context)
-            {
-                try
-                {
-                    if (id == null || _context.Person == null)
-                    {
-                        throw new ArgumentException("Person not found");
-                    }
-                    var existingPerson = await (from x in _context.Person
-                                                where x.Id == id
-                                                select x).FirstOrDefaultAsync();
+        //#region [DeleteAsync(Guid? id)]
+        //public async Task DeleteAsync(Guid? id)
+        //{
+        //    using (_context)
+        //    {
+        //        try
+        //        {
+        //            if (id == null || _context.Person == null)
+        //            {
+        //                throw new ArgumentException("Person not found");
+        //            }
+        //            var existingPerson = await (from x in _context.Person
+        //                                        where x.Id == id
+        //                                        select x).FirstOrDefaultAsync();
 
-                    if (existingPerson != null)
-                    {
-                        _context.Entry(existingPerson).State = EntityState.Deleted;
-                        await _context.SaveChangesAsync();
-                    }
+        //            if (existingPerson != null)
+        //            {
+        //                _context.Entry(existingPerson).State = EntityState.Deleted;
+        //                await _context.SaveChangesAsync();
+        //            }
 
-                    //var q = (from x in _context.Person
-                    //         where x.Id == id
-                    //         select x).First();
-                    //_context.Entry(q).State = EntityState.Deleted;
-                    //_context.SaveChanges();
-                }
-                catch (Exception)
-                {
+        //            //var q = (from x in _context.Person
+        //            //         where x.Id == id
+        //            //         select x).First();
+        //            //_context.Entry(q).State = EntityState.Deleted;
+        //            //_context.SaveChanges();
+        //        }
+        //        catch (Exception)
+        //        {
 
-                    throw;
-                }
-                finally
-                {
-                    if (_context.Person != null) _context.Dispose();
-                }
+        //            throw;
+        //        }
+        //        finally
+        //        {
+        //            if (_context.Person != null) _context.Dispose();
+        //        }
 
-            }
-        }
-        #endregion
+        //    }
+        //}
+        //#endregion
 
         #region [DeleteAsync(Person person)]
-        public async Task DeleteAsync(Person person)
+        public async Task<bool> DeleteAsync(Person person)
         {
             using (_context)
             {
-
                 try
                 {
                     if (_context.Person == null)
                     {
-                        throw new ArgumentException("Entity set 'PersonIdentityDBContext.Person'  is null.");
+                        throw new ArgumentException("Entity set 'PersonIdentityDBContext.Person' is null.");
                     }
                     var existingPerson = await _context.Person.FindAsync(person.Id);
                     if (existingPerson != null)
                     {
                         _context.Person.Remove(existingPerson);
+                        await _context.SaveChangesAsync();
+                        return true;
                     }
-                    await _context.SaveChangesAsync();
+                    return false;
                 }
                 catch (Exception)
                 {
-
+                    // Ideally, log this exception
                     throw;
                 }
             }
@@ -217,44 +218,44 @@ namespace RepositoryDesignPatternDomainDrivenDesign.Models.Services.Repositories
         #endregion
 
 
-        #region [UpdateAsync(Guid? id)]
-        public async Task UpdateAsync(Guid? id)
-        {
-            using (_context)
-            {
-                try
-                {
-                    if (id == null)
-                    {
-                        throw new ArgumentNullException(nameof(id));
-                    }
+        //#region [UpdateAsync(Guid? id)]
+        //public async Task UpdateAsync(Guid? id)
+        //{
+        //    using (_context)
+        //    {
+        //        try
+        //        {
+        //            if (id == null)
+        //            {
+        //                throw new ArgumentNullException(nameof(id));
+        //            }
 
-                    var existingPerson = await _context.Person.FindAsync(id);
-                    if (existingPerson == null)
-                    {
-                        throw new ArgumentException("Person not found");
-                    }
-
-
-                }
-                catch (Exception)
-                {
-
-                    throw;
-                }
-                finally
-                {
-                    if (_context != null)
-                    {
-                        _context.Dispose();
-                    }
-                }
-            }
-
-        }
+        //            var existingPerson = await _context.Person.FindAsync(id);
+        //            if (existingPerson == null)
+        //            {
+        //                throw new ArgumentException("Person not found");
+        //            }
 
 
-        #endregion
+        //        }
+        //        catch (Exception)
+        //        {
+
+        //            throw;
+        //        }
+        //        finally
+        //        {
+        //            if (_context != null)
+        //            {
+        //                _context.Dispose();
+        //            }
+        //        }
+        //    }
+
+        //}
+
+
+        //#endregion
     }
 }
 

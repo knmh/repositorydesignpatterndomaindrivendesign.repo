@@ -2,6 +2,8 @@
 {
     public class DeletePersonDtoPostService
     {
-        public Guid RealId { get; set; }
+       //public Guid RealId { get; set; }
+        public string AbstractId { get; set; }
+
     }
 }

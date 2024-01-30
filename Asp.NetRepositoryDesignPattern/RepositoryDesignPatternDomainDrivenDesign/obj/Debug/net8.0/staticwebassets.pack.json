@@ -5,12 +5,20 @@
       "PackagePath": "staticwebassets\\RepositoryDesignPatternDomainDrivenDesign.bundle.scp.css"
     },
     {
+      "Id": "H:\\RepositoryDesignPatternDomainDrivenDesign.repo\\Asp.NetRepositoryDesignPattern\\RepositoryDesignPatternDomainDrivenDesign\\wwwroot\\css\\personStyle.css",
+      "PackagePath": "staticwebassets\\css\\personStyle.css"
+    },
+    {
       "Id": "H:\\RepositoryDesignPatternDomainDrivenDesign.repo\\Asp.NetRepositoryDesignPattern\\RepositoryDesignPatternDomainDrivenDesign\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },
     {
       "Id": "H:\\RepositoryDesignPatternDomainDrivenDesign.repo\\Asp.NetRepositoryDesignPattern\\RepositoryDesignPatternDomainDrivenDesign\\wwwroot\\favicon.ico",
       "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "H:\\RepositoryDesignPatternDomainDrivenDesign.repo\\Asp.NetRepositoryDesignPattern\\RepositoryDesignPatternDomainDrivenDesign\\wwwroot\\js\\personScript.js",
+      "PackagePath": "staticwebassets\\js\\personScript.js"
     },
     {
       "Id": "H:\\RepositoryDesignPatternDomainDrivenDesign.repo\\Asp.NetRepositoryDesignPattern\\RepositoryDesignPatternDomainDrivenDesign\\wwwroot\\js\\site.js",

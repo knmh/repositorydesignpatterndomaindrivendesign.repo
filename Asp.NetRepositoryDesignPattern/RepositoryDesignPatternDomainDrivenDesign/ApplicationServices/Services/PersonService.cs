@@ -39,17 +39,24 @@ namespace RepositoryDesignPatternDomainDrivenDesign.ApplicationServices.Services
         #endregion
         #region [DeleteConfirmed(DeletePersonDtoPostService deletePersonDtoPostService)]
 
-        public async Task DeleteAsync(DeletePersonDtoPostService deletePersonDtoPostService)
+        public async Task<bool> DeleteAsync(DeletePersonDtoPostService deletePersonDtoPostService)
         {
-            //_person.Id = deletePersonDtoPostService.RealId;
-            //await _personRepository.DeleteAsync(_person);
-            var person = await _personRepository.SelectByIdAsync(deletePersonDtoPostService.RealId);
-            if (person != null)
+            var realId = GetRealId(new GetRealIdPersonDtoService { AbstractId = deletePersonDtoPostService.AbstractId });
+            if (realId.HasValue)
             {
-                await _personRepository.DeleteAsync(person);
+                var person = await _personRepository.SelectByIdAsync(realId.Value);
+                if (person != null)
+                {
+                    await _personRepository.DeleteAsync(person);
+                    return true;
+                }
             }
+            return false;
         }
         #endregion
+
+
+
         #region [ShowAllAsync()]
         public async Task<List<PersonDto>> ShowAllAsync()
         {
